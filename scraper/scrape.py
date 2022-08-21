@@ -79,3 +79,13 @@ def get_theme_color(html):
         return color
     return None
 
+
+def get_link_hrefs(html):
+    """Scrape brand color."""
+    links = []
+    
+    for link in html.find_all("a"):
+        links.append(link.get("href"))
+
+    return links
+

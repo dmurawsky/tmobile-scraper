@@ -1,19 +1,14 @@
 """Scrape metadata from target URL."""
 import requests
 from bs4 import BeautifulSoup
-import pprint
 from .scrape import (
-    get_title,
-    get_description,
-    get_image,
-    get_site_name,
-    get_favicon,
-    get_theme_color
+    get_link_hrefs
 )
 
+memo = []
 
-def scrape_page_metadata(url):
-    """Scrape target URL for metadata."""
+def scrape_page(url):
+    """Scrape target URL for links."""
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
@@ -21,17 +16,24 @@ def scrape_page_metadata(url):
         'Access-Control-Max-Age': '3600',
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
     }
-    pp = pprint.PrettyPrinter(indent=4)
     r = requests.get(url, headers=headers)
     html = BeautifulSoup(r.content, 'html.parser')
-    metadata = {
-        'title': get_title(html),
-        'description': get_description(html),
-        'image': get_image(html),
-        'favicon': get_favicon(html, url),
-        'sitename': get_site_name(html, url),
-        'color': get_theme_color(html),
-        'url': url
-        }
-    pp.pprint(metadata)
-    return metadata
+    
+    links = get_link_hrefs(html)
+
+    for link in links:
+        if link:
+            if link in memo: continue
+
+            memo.append(link)
+
+            if "@" in link: 
+                continue
+            elif "tmobile-familymode.com" in link:
+                print(link)
+            elif link[0] == "/":
+                print("Scraping: " + link)
+                scrape_page("https://www.t-mobile.com" + link)
+            elif "t-mobile.com" in link:
+                print("Scraping: " + link)
+                scrape_page(link)
