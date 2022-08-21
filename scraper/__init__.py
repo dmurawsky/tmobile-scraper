@@ -27,7 +27,7 @@ def scrape_page(url):
 
             memo.append(link)
 
-            if "@" in link: 
+            if "@" in link or ".pdf" in link: 
                 continue
             elif "tmobile-familymode.com" in link:
                 print(link)
